@@ -129,4 +129,49 @@ void tensor_free(Tensor* tensor) {
     free(tensor);
 }
 
+size_t tensor_size(const Tensor* tensor) {
+    if (tensor->size) return tensor->size;
+    return calculate_size(tensor->shape, tensor->ndim);
+}
 
+size_t dtype_size(DataType dtype) {
+    switch (dtype)
+    {
+    case DTYPE_FLOAT32:
+        return sizeof(float);
+    case DTYPE_INT32:
+        return sizeof(int);
+    case DTYPE_INT8:
+        return sizeof(char);
+    default:
+        return sizeof(float);
+    }
+}
+
+void tensor_print(Tensor* tensor) {
+    printf("Tensor(shape=[");
+    for (int dim = 0; dim < tensor->ndim; dim++) {
+        printf("%d", tensor->shape[dim]);
+        if (dim < tensor->ndim - 1) {
+            printf(", ");
+        }
+    }
+    printf("], dtype=%d, size=%d items\n", tensor->dtype, tensor->size);
+
+    printf("Data inside: [");
+
+    int maxsize_to_print = 20;
+    if (tensor->size < maxsize_to_print) {
+        maxsize_to_print = tensor->size;
+    }
+
+    float* data = (float*)tensor->data;
+    for (int index = 0; index < maxsize_to_print; index++) {
+        printf("%.2f", data[index]);
+        if (index < maxsize_to_print - 1) {
+            printf(", ");
+        }
+    } 
+    printf("]\n");
+
+}

@@ -33,7 +33,7 @@ void tensor_free(Tensor* tensor);
 
 // ======Info======
 
-size_t tensor_size(const Tensor* tesor);
+size_t tensor_size(const Tensor* tensor);
 size_t dtype_size(DataType dtype);
 void tensor_print(Tensor* tensor);
 
