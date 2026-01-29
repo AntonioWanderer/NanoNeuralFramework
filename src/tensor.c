@@ -202,3 +202,106 @@ void tensor_set_item(Tensor* tensor, const int* indexes, void* value) {
     memcpy((char*)tensor->data + element_size * liner_index, value, element_size);
 }
 
+Tensor* tensor_add(const Tensor* first, const Tensor* second) {
+    assert(first->dtype == second->dtype);
+    assert(first->ndim == second->ndim);
+    for (int index = 0; index < first->ndim; index++) {
+        assert(first->shape[index] == second->shape[index]);
+    }
+    assert(first->dtype == DTYPE_FLOAT32);
+    
+    Tensor* result = tensor_create(first->shape, first->ndim, first->dtype);
+
+    float* first_data = (float*)first->data;
+    float* second_data = (float*)second->data;
+    float* result_data = (float*)result->data;
+
+    for (int index = 0; index < first->size; index++) {
+        result_data[index] = first_data[index] + second_data[index];
+    }
+
+    return result;
+}
+
+Tensor* tensor_mul(const Tensor* first, const Tensor* second) {
+    assert(first->dtype == second->dtype);
+    assert(first->ndim == second->ndim);
+    for (int index = 0; index < first->ndim; index++) {
+        assert(first->shape[index] == second->shape[index]);
+    }
+    assert(first->dtype == DTYPE_FLOAT32);
+    
+    Tensor* result = tensor_create(first->shape, first->ndim, first->dtype);
+
+    float* first_data = (float*)first->data;
+    float* second_data = (float*)second->data;
+    float* result_data = (float*)result->data;
+
+    for (int index = 0; index < first->size; index++) {
+        result_data[index] = first_data[index] * second_data[index];
+    }
+    
+    return result;
+}
+
+Tensor* tensor_matmul_naive(const Tensor* first, const Tensor* second) {
+    assert(first->dtype == second->dtype);
+    assert(first->ndim == second->ndim);
+    assert((float*)first->shape[1] == (float*)second->shape[0]);
+    assert(first->dtype == DTYPE_FLOAT32);
+    assert(first->ndim == 2);
+    
+    int* new_shape[2];
+    new_shape[0] = (float*)first->shape[0];
+    new_shape[1] = (float*)second->shape[1];
+
+    Tensor* result = tensor_create(new_shape, 2, first->dtype);
+
+    int* indexes_first[2];
+    int* indexes_second[2];
+    int* indexes_current[2];
+
+    for(int dim1 = 0; dim1 < new_shape[0]; dim1++) {
+        for(int dim2 = 0; dim2 < new_shape[1]; dim2++) {
+            float new_item = 0;
+            for(int sum_index = 0; sum_index < (float*)first->shape[1]; sum_index++) {
+                indexes_first[0] = dim1;
+                indexes_first[1] = sum_index;
+                indexes_second[0] = sum_index;
+                indexes_second[1] = dim2;
+                float item_one = *(float*)tensor_get_item(first, indexes_first);
+                float item_two = *(float*)tensor_get_item(second, indexes_second);
+                new_item += item_one * item_two;
+            }
+            indexes_current[0] = dim1;
+            indexes_current[1] = dim2;
+            tensor_set_item(result, indexes_current, &new_item);
+        }
+    }
+
+    return result;
+}
+
+Tensor* tensor_relu(const Tensor* tensor) {
+    assert(tensor->dtype == DTYPE_FLOAT32);
+
+    Tensor* result = tensor_create(tensor->shape, tensor->ndim, tensor->dtype);
+    
+    float* src = (float*)tensor->data;
+    float* dst = (float*)result->data;
+
+    for (int index = 0; index < tensor->size; index++) {
+        dst[index] = src[index] > 0.0f ? src[index] : 0.0f;
+    }
+    return result;
+}
+
+// ======Optimized operations======
+
+Tensor* tensor_matmul_simd(const Tensor* first, const Tensor* second) {
+
+}
+
+Tensor* tensor_conv2d_naive(const Tensor* input, const Tensor* kernel) {
+
+}
