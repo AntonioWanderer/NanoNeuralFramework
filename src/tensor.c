@@ -175,3 +175,30 @@ void tensor_print(Tensor* tensor) {
     printf("]\n");
 
 }
+
+// get data from tensor as float
+float* tensor_get_data_float(const Tensor* tensor) {
+    assert(tensor->dtype == DTYPE_FLOAT32);
+    return (float*)tensor->data;
+}
+
+static size_t get_linear_index(const int* strides, int ndim, const int* indexes) {
+    int linear_index = 0;
+    for (int dim = 0; dim < ndim; dim++) {
+        linear_index += indexes[dim] * strides[dim];
+    }
+    return linear_index;
+}
+
+void* tensor_get_item(const Tensor* tensor, const int* indexes) {
+    size_t liner_index = get_linear_index(tensor->strides, tensor->ndim, indexes);
+    size_t element_size = dtype_size(tensor->dtype);
+    return (char*)tensor->data + element_size * liner_index;
+}
+
+void tensor_set_item(Tensor* tensor, const int* indexes, void* value) {
+    size_t liner_index = get_linear_index(tensor->strides, tensor->ndim, indexes);
+    size_t element_size = dtype_size(tensor->dtype);
+    memcpy((char*)tensor->data + element_size * liner_index, value, element_size);
+}
+
