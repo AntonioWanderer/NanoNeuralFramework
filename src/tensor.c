@@ -251,15 +251,15 @@ Tensor* tensor_matmul_naive(const Tensor* first, const Tensor* second) {
     assert(first->dtype == DTYPE_FLOAT32);
     assert(first->ndim == 2);
     
-    int* new_shape[2];
-    new_shape[0] = (float*)first->shape[0];
-    new_shape[1] = (float*)second->shape[1];
+    int new_shape[2];
+    new_shape[0] = *(float*)first->shape[0];
+    new_shape[1] = *(float*)second->shape[1];
 
     Tensor* result = tensor_create(new_shape, 2, first->dtype);
 
-    int* indexes_first[2];
-    int* indexes_second[2];
-    int* indexes_current[2];
+    int indexes_first[2];
+    int indexes_second[2];
+    int indexes_current[2];
 
     for(int dim1 = 0; dim1 < new_shape[0]; dim1++) {
         for(int dim2 = 0; dim2 < new_shape[1]; dim2++) {
